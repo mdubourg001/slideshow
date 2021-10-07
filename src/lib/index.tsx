@@ -1,16 +1,33 @@
-import { useContext, useEffect, useCallback } from "react";
-import useSessionstorage from "@rooks/use-sessionstorage";
+import {
+  useContext,
+  useEffect,
+  useCallback,
+  createContext,
+  useState,
+} from "react";
+import useLocalstorage from "@rooks/use-localstorage";
 import cs from "classnames";
 
-import { SlideshowProps, SlideProps, TextProps, ImageProps } from "./types";
+import {
+  SlideshowProps,
+  SlideProps,
+  TextProps,
+  ImageProps,
+  NotesProps,
+} from "./types";
 import { ThemeContext } from "./ThemeContext";
 
 import "./slideshow.css";
 
+const NotesWritterContext = createContext({
+  writeSlideNotes: (_: string) => {},
+});
+
 export function Slideshow({ id, children, className }: SlideshowProps) {
   const theme = useContext(ThemeContext);
 
-  const [slide, setSlide] = useSessionstorage(id, 0);
+  const [slide, setSlide] = useLocalstorage(`slideshow__${id}__slide`, 0);
+  const [notes, setNotes] = useState<Record<number, string>>({});
 
   const handleKeyDown = useCallback(
     (event) => {
@@ -27,19 +44,47 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
     [slide, children]
   );
 
+  const writeSlideNotes = useCallback(
+    (note: string) => {
+      setNotes({
+        ...notes,
+        [slide]: note,
+      });
+    },
+    [notes, slide]
+  );
+
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  const currentSlide = Array.isArray(children) ? children[slide] : children;
+
+  if (!!children && currentSlide === undefined) {
+    setSlide(0);
+  }
+
   return (
-    <section
-      className={cs("fixed inset-0 w-screen h-screen", className)}
-      style={{ fontFamily: theme.defaultFontFamily }}
-    >
-      {Array.isArray(children) ? children[slide] : children}
-    </section>
+    <NotesWritterContext.Provider value={{ writeSlideNotes }}>
+      <section
+        className={cs("fixed inset-0 w-screen h-screen", className)}
+        style={{ fontFamily: theme.defaultFontFamily }}
+      >
+        {currentSlide}
+      </section>
+    </NotesWritterContext.Provider>
   );
+}
+
+export function Notes({ children }: NotesProps) {
+  const { writeSlideNotes } = useContext(NotesWritterContext);
+
+  useEffect(() => {
+    setTimeout(() => writeSlideNotes(children), 0);
+  }, [children]);
+
+  return null;
 }
 
 export function Slide({
@@ -67,7 +112,7 @@ export function Slide({
             "justify-center": alignY === "center",
             "justify-end": alignY === "end",
             "items-start": alignX === "start",
-            "items-center": alignX === "center",
+            "items-center text-center": alignX === "center",
             "items-end": alignX === "end",
           },
           className
@@ -86,6 +131,7 @@ export function Text({
   alignX,
   alignY,
   absolute,
+  textColor,
 }: TextProps) {
   const theme = useContext(ThemeContext);
 
@@ -105,6 +151,7 @@ export function Text({
   return (
     <Tag
       className={cs(
+        textColor ?? theme.textColor,
         {
           // size
           "font-bold": theme.boldTextSizes.includes(size),
@@ -156,7 +203,8 @@ export function Image({
         !inBackground && width,
         !inBackground && height,
         {
-          "slideshow__image--in-background fixed inset-0 w-full h-full": inBackground,
+          "slideshow__image--in-background fixed inset-0 w-full h-full":
+            inBackground,
           // alignment
           "mx-auto": alignX === "center",
           "ml-auto": alignX === "end",
@@ -180,4 +228,11 @@ export function Image({
 }
 
 export { ThemeContext } from "./ThemeContext";
+export type {
+  Theme,
+  SlideshowProps,
+  SlideProps,
+  TextProps,
+  ImageProps,
+} from "./types";
 export { DEFAULT_THEME as defaultTheme } from "./const";

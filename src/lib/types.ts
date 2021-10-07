@@ -14,6 +14,10 @@ export interface SlideshowProps {
   className?: string;
 }
 
+export interface NotesProps {
+  children: string;
+}
+
 export type SlideProps = Alignable & {
   children?: React.ReactNode;
   className?: string;
@@ -25,6 +29,7 @@ export type TextProps = Alignable &
     children?: React.ReactNode;
     className?: string;
     size?: Size;
+    textColor?: string;
   };
 
 export type ImageProps = Alignable &
@@ -49,6 +54,7 @@ export type AbsolutePos =
 export interface Theme {
   defaultFontFamily: string;
   headingFontFamily: string;
+  textColor: string;
   slidePadding: string;
   slideBgColor: string;
   elementSpacing: string;
