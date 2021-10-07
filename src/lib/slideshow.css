@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.slideshow__image--in-background {
+  z-index: 0;
+}
+
+.slideshow__image--in-background ~ * {
+  z-index: 1;
+}

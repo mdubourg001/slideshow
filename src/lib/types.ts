@@ -1,25 +1,40 @@
 import React from "react";
 
-export interface SlideshowProps {
-  children?: React.ReactNode;
-  className?: string;
-}
-
-export interface SlideProps {
-  children?: React.ReactNode;
-  className?: string;
+interface Alignable {
   alignX?: Alignment;
   alignY?: Alignment;
 }
 
-export interface TextProps {
-  children?: React.ReactNode;
-  className?: string;
-  size?: Size;
-  alignX?: Alignment;
-  alignY?: Alignment;
+interface Positionable {
   absolute?: AbsolutePos;
 }
+export interface SlideshowProps {
+  id: string;
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export type SlideProps = Alignable & {
+  children?: React.ReactNode;
+  className?: string;
+  bgColor?: string;
+};
+
+export type TextProps = Alignable &
+  Positionable & {
+    children?: React.ReactNode;
+    className?: string;
+    size?: Size;
+  };
+
+export type ImageProps = Alignable &
+  Positionable & {
+    className?: string;
+    src: string;
+    width?: string;
+    height?: string;
+    inBackground?: boolean;
+  };
 
 export type Size = "title" | "subtitle" | "normal" | "small";
 
@@ -35,6 +50,7 @@ export interface Theme {
   defaultFontFamily: string;
   headingFontFamily: string;
   slidePadding: string;
+  slideBgColor: string;
   elementSpacing: string;
   titleFontSize: string;
   subtitleFontSize: string;

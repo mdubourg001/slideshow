@@ -7,6 +7,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@rooks/use-sessionstorage": "^4.11.2",
     "classnames": "^2.3.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"

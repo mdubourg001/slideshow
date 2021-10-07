@@ -281,6 +281,11 @@
     estree-walker "^2.0.1"
     picomatch "^2.2.2"
 
+"@rooks/use-sessionstorage@^4.11.2":
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/@rooks/use-sessionstorage/-/use-sessionstorage-4.11.2.tgz#bf8aedbd7938053d73a754d7cb194f7d92cfab24"
+  integrity sha512-GGtLvnwOANAaWosm77253WeFX82RdoXKOXMkzzKY9v8qo4iIAF/apznhTcXAwe+8W4kv3UNyNCob0Y7l8+iiuw==
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
