@@ -34,7 +34,7 @@ const FirstSlide = () => (
 const SecondSlide = () => (
   <Slide alignX="center" alignY="center">
     <Notes>{`
-      Alors voila coucou euh...{}
+      Alors voila coucou euh...
       Moi c'est Titouan...
     `}</Notes>
 

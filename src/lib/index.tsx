@@ -5,6 +5,7 @@ import {
   createContext,
   useState,
 } from "react";
+import ReactDOMServer from "react-dom/server";
 import useLocalstorage from "@rooks/use-localstorage";
 import cs from "classnames";
 
@@ -19,29 +20,37 @@ import { ThemeContext } from "./ThemeContext";
 
 import "./slideshow.css";
 
-const NotesWritterContext = createContext({
+const SlideshowContext = createContext({
   writeSlideNotes: (_: string) => {},
 });
 
 export function Slideshow({ id, children, className }: SlideshowProps) {
   const theme = useContext(ThemeContext);
 
+  const [presenterMode, setPresenterMode] = useState(false);
   const [slide, setSlide] = useLocalstorage(`slideshow__${id}__slide`, 0);
   const [notes, setNotes] = useState<Record<number, string>>({});
 
   const handleKeyDown = useCallback(
     (event) => {
       if (event.key === "ArrowLeft" && slide > 0) {
+        // ArrowLeft => Go to previous slide
         setSlide(slide - 1);
       } else if (
         event.key === "ArrowRight" &&
         Array.isArray(children) &&
         slide < children?.length - 1
       ) {
+        // ArrowRight => Go to next slide
         setSlide(slide + 1);
+      } else if (event.key === "p" && event.ctrlKey) {
+        // CTRL + p => Toggle presenter mode
+        setPresenterMode(!presenterMode);
+
+        event.preventDefault();
       }
     },
-    [slide, children]
+    [slide, presenterMode, children]
   );
 
   const writeSlideNotes = useCallback(
@@ -60,25 +69,61 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
   }, [handleKeyDown]);
 
   const currentSlide = Array.isArray(children) ? children[slide] : children;
+  const nextSlide =
+    Array.isArray(children) && children[slide + 1] ? children[slide + 1] : null;
+  const staticNextSlide = ReactDOMServer.renderToStaticMarkup(
+    (() => <>{nextSlide}</>)()
+  );
 
   if (!!children && currentSlide === undefined) {
     setSlide(0);
   }
 
+  if (!currentSlide) {
+    return null;
+  }
+
   return (
-    <NotesWritterContext.Provider value={{ writeSlideNotes }}>
+    <SlideshowContext.Provider value={{ writeSlideNotes }}>
       <section
         className={cs("fixed inset-0 w-screen h-screen", className)}
         style={{ fontFamily: theme.defaultFontFamily }}
       >
-        {currentSlide}
+        {presenterMode ? (
+          <div className="grid h-screen grid-cols-5 bg-gradient-to-br from-gray-700 to-gray-900">
+            <div className="flex flex-col col-span-3 px-6 my-6 border-r-2 border-white">
+              <div className="h-20"></div>
+
+              <div className="relative mb-6 h-3/5">{currentSlide}</div>
+              <div
+                className="relative transform scale-x-75 opacity-50 h-2/5"
+                dangerouslySetInnerHTML={{ __html: staticNextSlide }}
+              />
+            </div>
+
+            <div className="col-span-2 m-6">
+              <h2 className="mb-6 text-3xl font-bold text-gray-400 underline">
+                Notes
+              </h2>
+              <div className="max-h-[90vh] pb-64 overflow-y-auto">
+                {notes[slide]?.split("\n").map((line, i) => (
+                  <p key={`${line}-${i}`} className="text-2xl text-white">
+                    {line}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          currentSlide
+        )}
       </section>
-    </NotesWritterContext.Provider>
+    </SlideshowContext.Provider>
   );
 }
 
 export function Notes({ children }: NotesProps) {
-  const { writeSlideNotes } = useContext(NotesWritterContext);
+  const { writeSlideNotes } = useContext(SlideshowContext);
 
   useEffect(() => {
     setTimeout(() => writeSlideNotes(children), 0);
@@ -203,8 +248,7 @@ export function Image({
         !inBackground && width,
         !inBackground && height,
         {
-          "slideshow__image--in-background fixed inset-0 w-full h-full":
-            inBackground,
+          "slideshow__image--in-background fixed inset-0 w-full h-full": inBackground,
           // alignment
           "mx-auto": alignX === "center",
           "ml-auto": alignX === "end",
