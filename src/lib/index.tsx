@@ -28,8 +28,28 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
   const theme = useContext(ThemeContext);
 
   const [presenterMode, setPresenterMode] = useState(false);
-  const [slide, setSlide] = useLocalstorage(`slideshow__${id}__slide`, 0);
   const [notes, setNotes] = useState<Record<number, string>>({});
+  const [storageSlide, setSlide] = useLocalstorage(
+    `slideshow__${id}__slide`,
+    0
+  );
+
+  const [timer, setTimer] = useState(0);
+  const [hrDuration, setHrDuration] = useState("00:00");
+  const [timerRunning, setTimerRunning] = useState(false);
+
+  const slide = parseInt(storageSlide, 10);
+  const slideCount = Array.isArray(children) ? children.length : 1;
+
+  const writeSlideNotes = useCallback(
+    (note: string) => {
+      setNotes({
+        ...notes,
+        [slide]: note,
+      });
+    },
+    [notes, slide]
+  );
 
   const handleKeyDown = useCallback(
     (event) => {
@@ -43,30 +63,47 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
       ) {
         // ArrowRight => Go to next slide
         setSlide(slide + 1);
-      } else if (event.key === "p" && event.ctrlKey) {
-        // CTRL + p => Toggle presenter mode
+      } else if (event.key === "p") {
+        // p => Toggle presenter mode
         setPresenterMode(!presenterMode);
-
-        event.preventDefault();
+      } else if (event.key === "t") {
+        // t => Toggle timer running
+        setTimerRunning(!timerRunning);
       }
     },
-    [slide, presenterMode, children]
-  );
-
-  const writeSlideNotes = useCallback(
-    (note: string) => {
-      setNotes({
-        ...notes,
-        [slide]: note,
-      });
-    },
-    [notes, slide]
+    [slide, presenterMode, timerRunning, children]
   );
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
+
+  useEffect(() => {
+    let interval: number;
+
+    if (timerRunning) {
+      interval = setInterval(() => {
+        const updatedTimer = timer + 1;
+        const secondCounter = updatedTimer % 60;
+        const minuteCounter = Math.floor(updatedTimer / 60);
+
+        const computedSecond =
+          String(secondCounter).length === 1
+            ? `0${secondCounter}`
+            : secondCounter;
+        const computedMinute =
+          String(minuteCounter).length === 1
+            ? `0${minuteCounter}`
+            : minuteCounter;
+
+        setHrDuration(`${computedMinute}:${computedSecond}`);
+        setTimer(updatedTimer);
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [timerRunning, timer]);
 
   const currentSlide = Array.isArray(children) ? children[slide] : children;
   const nextSlide =
@@ -91,8 +128,20 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
       >
         {presenterMode ? (
           <div className="grid h-screen grid-cols-5 bg-gradient-to-br from-gray-700 to-gray-900">
-            <div className="flex flex-col col-span-3 px-6 my-6 border-r-2 border-white">
-              <div className="h-20"></div>
+            <div className="flex flex-col col-span-3 px-6 my-6 border-r-2 border-gray-500">
+              <div className="flex items-center justify-between h-10">
+                <p className="text-lg text-white">
+                  Slide {slide + 1}/{slideCount}
+                </p>
+                <div className="px-4 bg-gray-300 rounded">
+                  <span
+                    className={timerRunning ? "text-red-800 font-semibold" : ""}
+                  >
+                    {hrDuration}
+                  </span>{" "}
+                  {!timerRunning && "(paused)"}
+                </div>
+              </div>
 
               <div className="relative mb-6 h-3/5">{currentSlide}</div>
               <div
