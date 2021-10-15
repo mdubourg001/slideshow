@@ -1,0 +1,33 @@
+:root {
+  font-size: 15px;
+}
+
+.w-fit {
+  width: fit-content;
+}
+
+.h-fit {
+  height: fit-content;
+}
+
+.-rotate-360 {
+  --tw-rotate: -360deg;
+}
+
+/* animations */
+
+@keyframes slidein {
+  from {
+    opacity: 50%;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 100%;
+    transform: none;
+  }
+}
+
+pre > code:not(.noslidein),
+.slidein {
+  animation: slidein 500ms;
+}

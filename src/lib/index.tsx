@@ -24,11 +24,16 @@ const SlideshowContext = createContext({
   writeSlideNotes: (_: string) => {},
 });
 
-export function Slideshow({ id, children, className }: SlideshowProps) {
+export function Slideshow({
+  id,
+  children,
+  className,
+  onSlideChange,
+}: SlideshowProps) {
   const theme = useContext(ThemeContext);
 
-  const [presenterMode, setPresenterMode] = useState(false);
   const [notes, setNotes] = useState<Record<number, string>>({});
+  const [presenterMode, setPresenterMode] = useState(false);
   const [storageSlide, setSlide] = useLocalstorage(
     `slideshow__${id}__slide`,
     0
@@ -51,11 +56,16 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
     [notes, slide]
   );
 
+  const togglePresenterMode = useCallback(() => {
+    setPresenterMode(!presenterMode);
+  }, [presenterMode, theme]);
+
   const handleKeyDown = useCallback(
     (event) => {
       if (event.key === "ArrowLeft" && slide > 0) {
         // ArrowLeft => Go to previous slide
         setSlide(slide - 1);
+        onSlideChange?.(slide - 1);
       } else if (
         event.key === "ArrowRight" &&
         Array.isArray(children) &&
@@ -63,9 +73,10 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
       ) {
         // ArrowRight => Go to next slide
         setSlide(slide + 1);
+        onSlideChange?.(slide + 1);
       } else if (event.key === "p") {
         // p => Toggle presenter mode
-        setPresenterMode(!presenterMode);
+        togglePresenterMode();
       } else if (event.key === "t") {
         // t => Toggle timer running
         setTimerRunning(!timerRunning);
@@ -109,7 +120,9 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
   const nextSlide =
     Array.isArray(children) && children[slide + 1] ? children[slide + 1] : null;
   const staticNextSlide = ReactDOMServer.renderToStaticMarkup(
-    (() => <>{nextSlide}</>)()
+    (() => (
+      <ThemeContext.Provider value={theme}>{nextSlide}</ThemeContext.Provider>
+    ))()
   );
 
   if (!!children && currentSlide === undefined) {
@@ -135,7 +148,7 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
                 </p>
                 <div className="px-4 bg-gray-300 rounded">
                   <span
-                    className={timerRunning ? "text-red-800 font-semibold" : ""}
+                    className={timerRunning ? "text-red-700 font-semibold" : ""}
                   >
                     {hrDuration}
                   </span>{" "}
@@ -143,9 +156,9 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
                 </div>
               </div>
 
-              <div className="relative mb-6 h-3/5">{currentSlide}</div>
+              <div className="relative mb-6 h-2/3">{currentSlide}</div>
               <div
-                className="relative transform scale-x-75 opacity-50 h-2/5"
+                className="relative w-1/2 mx-auto opacity-50 h-1/3"
                 dangerouslySetInnerHTML={{ __html: staticNextSlide }}
               />
             </div>
@@ -154,7 +167,10 @@ export function Slideshow({ id, children, className }: SlideshowProps) {
               <h2 className="mb-6 text-3xl font-bold text-gray-400 underline">
                 Notes
               </h2>
-              <div className="max-h-[90vh] pb-64 overflow-y-auto">
+              <div
+                style={{ maxHeight: "90vh" }}
+                className="pb-64 overflow-y-auto"
+              >
                 {notes[slide]?.split("\n").map((line, i) => (
                   <p key={`${line}-${i}`} className="text-2xl text-white">
                     {line}
@@ -221,6 +237,7 @@ export function Slide({
 export function Text({
   children,
   className,
+  style,
   size = "normal",
   alignX,
   alignY,
@@ -237,13 +254,14 @@ export function Text({
   }[size] as keyof JSX.IntrinsicElements;
 
   const isHeading = theme.headingTextSizes.includes(size);
-  const fontFamilyProp = Object.assign(
-    {},
-    isHeading ? { style: { fontFamily: theme.headingFontFamily } } : undefined
-  );
+  const computedStyle = {
+    ...(style ?? {}),
+    fontFamily: isHeading ? theme.headingFontFamily : undefined,
+  };
 
   return (
     <Tag
+      style={computedStyle}
       className={cs(
         textColor ?? theme.textColor,
         {
@@ -271,7 +289,6 @@ export function Text({
         },
         className
       )}
-      {...fontFamilyProp}
     >
       {children}
     </Tag>
@@ -280,6 +297,7 @@ export function Text({
 
 export function Image({
   className,
+  style,
   src,
   absolute,
   alignX,
@@ -293,11 +311,13 @@ export function Image({
   return (
     <img
       src={src}
+      style={style}
       className={cs(
         !inBackground && width,
         !inBackground && height,
         {
-          "slideshow__image--in-background fixed inset-0 w-full h-full": inBackground,
+          "slideshow__image--in-background fixed inset-0 w-full h-full":
+            inBackground,
           // alignment
           "mx-auto": alignX === "center",
           "ml-auto": alignX === "end",

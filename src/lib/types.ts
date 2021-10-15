@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 
 interface Alignable {
   alignX?: Alignment;
@@ -12,6 +12,7 @@ export interface SlideshowProps {
   id: string;
   children?: React.ReactNode;
   className?: string;
+  onSlideChange?: (slideNumber: number) => void;
 }
 
 export interface NotesProps {
@@ -28,6 +29,7 @@ export type TextProps = Alignable &
   Positionable & {
     children?: React.ReactNode;
     className?: string;
+    style?: CSSProperties;
     size?: Size;
     textColor?: string;
   };
@@ -35,6 +37,7 @@ export type TextProps = Alignable &
 export type ImageProps = Alignable &
   Positionable & {
     className?: string;
+    style?: CSSProperties;
     src: string;
     width?: string;
     height?: string;
@@ -64,4 +67,6 @@ export interface Theme {
   smallFontSize: string;
   headingTextSizes: Size[];
   boldTextSizes: Size[];
+  defaultRootFontSize: string;
+  presenterModeRootFontSize: string;
 }

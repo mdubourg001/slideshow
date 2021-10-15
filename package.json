@@ -9,6 +9,7 @@
   "dependencies": {
     "@rooks/use-localstorage": "^4.11.2",
     "classnames": "^2.3.1",
+    "highlight.js": "^11.3.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },

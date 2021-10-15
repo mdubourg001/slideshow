@@ -13,4 +13,6 @@ export const DEFAULT_THEME: Theme = {
   smallFontSize: "text-lg",
   headingTextSizes: ["title", "subtitle"],
   boldTextSizes: ["title", "subtitle"],
+  defaultRootFontSize: "16px",
+  presenterModeRootFontSize: "14px",
 };
