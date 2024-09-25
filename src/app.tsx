@@ -83,7 +83,7 @@ const BrowserSlide = ({
     <Slide>
       <Notes>{``}</Notes>
 
-      <WebBrowser url="https://frontshare.com">
+      <WebBrowser url="https://best-meetup.com">
         {techLogos && (
           <div className="flex items-center justify-center h-full">
             <Image
@@ -329,11 +329,6 @@ requestIdleCallback(callback)`
                           callback
                         </div>
                       )}
-                      {callbackQueuePainting && (
-                        <div className="flex items-center justify-center px-4 bg-blue-400 rounded slidein">
-                          painting
-                        </div>
-                      )}
                       {callbackQueueCB1 && (
                         <div className="flex items-center justify-center px-4 bg-yellow-500 rounded slidein">
                           callback
@@ -342,6 +337,11 @@ requestIdleCallback(callback)`
                       {callbackQueueCB2 && (
                         <div className="flex items-center justify-center px-4 bg-yellow-500 rounded slidein">
                           callback
+                        </div>
+                      )}
+                      {callbackQueuePainting && (
+                        <div className="flex items-center justify-center px-4 bg-blue-400 rounded slidein">
+                          painting
                         </div>
                       )}
                       {callbackQueueRIC && (
@@ -377,8 +377,8 @@ const Summary = ({ step }: { step: number }) => (
       {step >= 1 && (
         <li>
           Chaque contexte de navigation (onglet / iframe) exécute la majorité de
-          ses tâches (scripting, rendering...) sur un seul thread (le{" "}
-          <b>Main Thread</b>)
+          ses tâches (scripting, rendering, manipulation de DOM...) sur un seul
+          thread (le <b>Main Thread</b>)
         </li>
       )}
       {step >= 2 && (
@@ -404,7 +404,7 @@ const Summary = ({ step }: { step: number }) => (
       {step >= 5 && (
         <li>
           Environ 60 fois par seconde, le navigateur ajoutera un <b>Repaint</b>{" "}
-          à la Callback Queue avec une priorité élevée
+          à la Callback Queue
         </li>
       )}
       {step >= 6 && (
@@ -430,7 +430,20 @@ const Summary = ({ step }: { step: number }) => (
           <code className="italic font-bold">
             requestAnimationFrame
           </code> et{" "}
-          <code className="italic font-bold">requestIdleCallback</code>
+          <code className="italic font-bold">requestIdleCallback</code>. Les{" "}
+          <b>Web Workers</b> permettent également de déporter du travail sur un
+          autre thread que le Main Thread
+        </li>
+      )}
+      {step >= 9 && (
+        <li>
+          En réalité : <b>la Callback Queue n'existe pas</b>. C'est une manière
+          simplifiée de représenter le fonctionnement de l'Event Loop qui fait
+          en réalité la différence entre <b>microtasks</b> (callbacks de{" "}
+          <code className="italic font-bold">Promise</code>,{" "}
+          <code className="italic font-bold">MutationObserver</code>s, etc...{" "}
+          <b>qu'il éxecutera en priorité</b>) et <b>macrotasks</b> (timers,
+          events utilisateurs...)
         </li>
       )}
     </ul>
@@ -619,25 +632,12 @@ function App() {
           codeEx2
           webApis
           callbackQueue
-          callbackQueueCB1
-          callbackQueueCB2
-          eventLoop
-          eventLoopSpin
-          renderEngine
-        />
-        <BrowserSlide
-          mainThread
-          v8
-          v8Content
-          codeEx1
-          codeEx2
-          webApis
-          callbackQueue
           callbackQueueCB2
           eventLoop
           eventLoopSpin
           renderEngine
           callStackCode6
+          callbackQueuePainting
         />
         <BrowserSlide
           mainThread
@@ -651,6 +651,7 @@ function App() {
           eventLoopSpin
           renderEngine
           callStackCode6Bis
+          callbackQueuePainting
         />
         <BrowserSlide
           mainThread
@@ -661,6 +662,20 @@ function App() {
           webApis
           callbackQueue
           eventLoop
+          eventLoopSpin
+          renderEngine
+          callbackQueuePainting
+        />
+        <BrowserSlide
+          mainThread
+          v8
+          v8Content
+          codeEx1
+          codeEx2
+          webApis
+          callbackQueue
+          eventLoop
+          eventLoopSpin
           renderEngine
         />
         <BrowserSlide
@@ -753,23 +768,6 @@ function App() {
           codeEx1
           codeEx2
           codeEx3
-          webApis
-          webApisRAF
-          callbackQueue
-          callbackQueueCB1
-          callbackQueueCB2
-          eventLoop
-          eventLoopSpin
-          renderEngine
-          callbackQueueRIC
-        />
-        <BrowserSlide
-          mainThread
-          v8
-          v8Content
-          codeEx1
-          codeEx2
-          codeEx3
           callStackCode6
           webApis
           webApisRAF
@@ -778,6 +776,7 @@ function App() {
           eventLoop
           eventLoopSpin
           renderEngine
+          callbackQueuePainting
           callbackQueueRIC
         />
         <BrowserSlide
@@ -788,6 +787,22 @@ function App() {
           codeEx2
           codeEx3
           callStackCode6Bis
+          webApis
+          webApisRAF
+          callbackQueue
+          eventLoop
+          eventLoopSpin
+          renderEngine
+          callbackQueuePainting
+          callbackQueueRIC
+        />
+        <BrowserSlide
+          mainThread
+          v8
+          v8Content
+          codeEx1
+          codeEx2
+          codeEx3
           webApis
           webApisRAF
           callbackQueue
@@ -833,6 +848,7 @@ function App() {
         <Summary step={6} />
         <Summary step={7} />
         <Summary step={8} />
+        <Summary step={9} />
 
         <ThanksQuestions />
       </Slideshow>
