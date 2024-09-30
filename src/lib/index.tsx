@@ -60,20 +60,28 @@ export function Slideshow({
     setPresenterMode(!presenterMode);
   }, [presenterMode, theme]);
 
+  const goToPreviousSlide = useCallback(() => {
+    setSlide(slide - 1);
+    onSlideChange?.(slide - 1);
+  }, [slide, onSlideChange]);
+
+  const goToNextSlide = useCallback(() => {
+    setSlide(slide + 1);
+    onSlideChange?.(slide + 1);
+  }, [slide, onSlideChange]);
+
   const handleKeyDown = useCallback(
     (event) => {
       if (event.key === "ArrowLeft" && slide > 0) {
         // ArrowLeft => Go to previous slide
-        setSlide(slide - 1);
-        onSlideChange?.(slide - 1);
+        goToPreviousSlide();
       } else if (
         event.key === "ArrowRight" &&
         Array.isArray(children) &&
         slide < children?.length - 1
       ) {
         // ArrowRight => Go to next slide
-        setSlide(slide + 1);
-        onSlideChange?.(slide + 1);
+        goToNextSlide();
       } else if (event.key === "p") {
         // p => Toggle presenter mode
         togglePresenterMode();

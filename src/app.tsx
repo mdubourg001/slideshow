@@ -83,7 +83,7 @@ const BrowserSlide = ({
     <Slide>
       <Notes>{``}</Notes>
 
-      <WebBrowser url="https://best-meetup.com">
+      <WebBrowser url={window.location.href}>
         {techLogos && (
           <div className="flex items-center justify-center h-full">
             <Image
@@ -443,7 +443,7 @@ const Summary = ({ step }: { step: number }) => (
           <code className="italic font-bold">Promise</code>,{" "}
           <code className="italic font-bold">MutationObserver</code>s, etc...{" "}
           <b>qu'il éxecutera en priorité</b>) et <b>macrotasks</b> (timers,
-          events utilisateurs...)
+          events utilisateurs...), qu'il éxecutera ensuite
         </li>
       )}
     </ul>
@@ -651,19 +651,6 @@ function App() {
           eventLoopSpin
           renderEngine
           callStackCode6Bis
-          callbackQueuePainting
-        />
-        <BrowserSlide
-          mainThread
-          v8
-          v8Content
-          codeEx1
-          codeEx2
-          webApis
-          callbackQueue
-          eventLoop
-          eventLoopSpin
-          renderEngine
           callbackQueuePainting
         />
         <BrowserSlide
