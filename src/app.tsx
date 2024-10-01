@@ -45,6 +45,7 @@ const BrowserSlide = ({
   callStackCode5,
   callStackCode6,
   callStackCode6Bis,
+  fullStack,
   codeEx3,
   v8,
   v8Content,
@@ -222,6 +223,19 @@ requestIdleCallback(callback)`
                             <pre>
                               <code className="text-xs rounded-lg language-javascript">
                                 callback()
+                              </code>
+                            </pre>
+                          )}
+                          {fullStack && (
+                            <pre className="flex flex-col gap-y-px">
+                              <code className="text-xs rounded-lg language-javascript">
+                                console.log('Log in infinite loop !');
+                              </code>
+                              <code className="text-xs rounded-lg language-javascript">
+                                console.log('Log in infinite loop !');
+                              </code>
+                              <code className="text-xs rounded-lg language-javascript">
+                                ...
                               </code>
                             </pre>
                           )}
@@ -608,8 +622,24 @@ function App() {
           callbackQueue
           callbackQueueCB1
           callbackQueueCB2
+          fullStack
           eventLoop
           renderEngine
+        />
+        <BrowserSlide
+          mainThread
+          v8
+          v8Content
+          codeEx1
+          codeEx2
+          webApis
+          callbackQueue
+          callbackQueueCB1
+          callbackQueueCB2
+          fullStack
+          eventLoop
+          renderEngine
+          callbackQueuePainting
         />
         <BrowserSlide
           mainThread
@@ -828,6 +858,7 @@ function App() {
           renderEngine
         />
 
+        <Summary step={0} />
         <Summary step={1} />
         <Summary step={2} />
         <Summary step={3} />
