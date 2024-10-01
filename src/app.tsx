@@ -340,8 +340,9 @@ requestIdleCallback(callback)`
                         </div>
                       )}
                       {callbackQueuePainting && (
-                        <div className="flex items-center justify-center px-4 bg-blue-400 rounded slidein">
-                          painting
+                        <div className="flex flex-col items-center justify-center px-4 text-center bg-blue-400 rounded slidein">
+                          <p>painting</p>
+                          <p className="text-xs text-gray-700">(~60x per s.)</p>
                         </div>
                       )}
                       {callbackQueueRIC && (
