@@ -322,13 +322,6 @@ requestIdleCallback(callback)`
                       color="black"
                       height="h-full w-full grid grid-cols-6 gap-x-4"
                     >
-                      {callbackQueueRAF && (
-                        <div className="flex items-center justify-center px-4 text-center bg-yellow-400 rounded slidein">
-                          rAF
-                          <br />
-                          callback
-                        </div>
-                      )}
                       {callbackQueueCB1 && (
                         <div className="flex items-center justify-center px-4 bg-yellow-500 rounded slidein">
                           callback
@@ -336,6 +329,13 @@ requestIdleCallback(callback)`
                       )}
                       {callbackQueueCB2 && (
                         <div className="flex items-center justify-center px-4 bg-yellow-500 rounded slidein">
+                          callback
+                        </div>
+                      )}
+                      {callbackQueueRAF && (
+                        <div className="flex items-center justify-center px-4 text-center bg-yellow-400 rounded slidein">
+                          rAF
+                          <br />
                           callback
                         </div>
                       )}
